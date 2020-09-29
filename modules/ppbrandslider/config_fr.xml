@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+    <name>ppbrandslider</name>
+    <displayName><![CDATA[Brand Logo Slider]]></displayName>
+    <version><![CDATA[1.0.0]]></version>
+    <description><![CDATA[This module add a gallery or slider with Brand Logos in your shop, with link on the image to directly go to manufacturer&#039;s page.]]></description>
+    <author><![CDATA[Presta Patron]]></author>
+    <tab><![CDATA[advertising_marketing]]></tab>
+	<confirmUninstall><![CDATA[Are you sure you want to uninstall?]]></confirmUninstall>
+    <is_configurable>1</is_configurable>
+    <need_instance>0</need_instance>
+	<limited_countries></limited_countries>
+</module>

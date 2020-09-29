@@ -1,0 +1,92 @@
+{# /**
+ * 2007-2019 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ * @author    PrestaShop SA <contact@prestashop.com>
+ * @copyright 2007-2019 PrestaShop SA
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  International Registered Trademark & Property of PrestaShop SA
+ */ #}
+
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block content %}
+  <div id="livechat-connect"></div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script src="https://cdn.polyfill.io/v3/polyfill.min.js?features=default,es6,fetch,Array.prototype.includes,Object.keys,Symbol.iterator&flags=gated" type="text/javascript"></script>
+  <script src="{{ moduleAssetsPath ~ 'js/connect.js' }}" type="text/javascript"></script>
+  <script>
+    var LC_TOKEN = '{{ lcToken|e }}';
+    var STORE_TOKEN = '{{ storeToken|e }}';
+    var STORE_URL = '{{ storeUrl|e }}';
+    var USER_EMAIL = '{{ userEmail|e }}';
+    var USER_NAME = '{{ userName|e }}';
+    var PS_VER = '{{ psVer|e }}';
+    var MODULE_VER = '{{ moduleVer|e }}';
+
+    (function () {
+      var interval = setInterval(function () {
+        if (window.AppBridge === undefined) {
+          return;
+        }
+        clearInterval(interval);
+
+        function userSignedInHandler(userToken, storeToken) {
+          fetch('{{ endpoints.connect|e }}&store_token=' + storeToken + '&user_token=' + userToken);
+        }
+
+        var eventsRegister = new AppBridge.EventsRegister();
+        eventsRegister.register(AppBridge.UserSignedInEvent, data => userSignedInHandler(data.userToken, data.storeToken));
+
+        AppBridge.AppBridgeParent.init('prestashop', eventsRegister, document.getElementById('livechat-connect'), '{{ appUrl }}').then(bridge => {
+          if (LC_TOKEN) {
+            return bridge.call(AppBridge.SignInCommand.fromObject({
+              userToken: LC_TOKEN,
+              platform: 'prestashop',
+              platformVer: PS_VER,
+              moduleVer: MODULE_VER
+            }));
+          }
+
+          if(STORE_TOKEN) {
+            return bridge.call(AppBridge.JoinCommand.fromObject({
+              storeToken: STORE_TOKEN,
+              userId: USER_EMAIL,
+              userName: USER_NAME,
+              platform: 'prestashop',
+              platformVer: PS_VER,
+              moduleVer: MODULE_VER
+            }));
+          }
+
+          return bridge.call(AppBridge.ConnectCommand.fromObject({
+            storeUrl: STORE_URL,
+            userId: USER_EMAIL,
+            userName: USER_NAME,
+            platform: 'prestashop',
+            platformVer: PS_VER,
+            moduleVer: MODULE_VER
+          }));
+        });
+      }, 100);
+    })();
+  </script>
+{% endblock %}
